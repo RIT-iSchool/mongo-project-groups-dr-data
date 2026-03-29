@@ -6,7 +6,7 @@ const cors = require('cors');
 const { connectDB } = require('./db/connection');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
 
 // Middleware
 // for frontend 
