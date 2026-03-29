@@ -20,19 +20,19 @@ const CONDITION_IMAGE_MAP = [
   { keywords: ['asthma', 'pulmonar', 'respiratory', 'copd', 'bronch'],
     file: 'Asthma_attack-illustration_NIH.jpg' },
   { keywords: ['depression', 'anxiety', 'mental', 'psychiatr', 'schizophr', 'bipolar'],
-    file: 'Sadness_and_depression.jpg' },
+    file: 'Depression.jpg' },
   { keywords: ['stroke', 'parkinson', 'epileps', 'multiple sclerosis', 'neuro'],
     file: 'Human_brain_NIH.jpg' },
   { keywords: ['hiv', 'aids', 'hepatitis', 'infection', 'viral'],
     file: 'HIV-budding-Color.jpg' },
   { keywords: ['arthritis', 'rheumat', 'lupus', 'autoimmune'],
-    file: 'Rheumatoid_arthritis_joint_evolution-en.svg' },
+    file: 'Rheumatoid_Arthritis_Joint_Evolution.svg' },
   { keywords: ['obesity', 'weight', 'bmi', 'metabolic'],
     file: 'Body_mass_index_chart.svg' },
   { keywords: ['sleep', 'insomnia', 'apnea'],
-    file: 'Sleep_EEG_REM.png' },
+    file: 'Sleep_EEG_REM.svg' },
   { keywords: ['pain', 'opioid', 'analges'],
-    file: 'Pain_assessment.jpg' },
+    file: 'Pain_scale.jpg' },
 ];
 
 // Fallback image used when no condition keyword matches
