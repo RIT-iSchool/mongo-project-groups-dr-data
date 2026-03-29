@@ -32,7 +32,7 @@ const CONDITION_IMAGE_MAP = [
   { keywords: ['sleep', 'insomnia', 'apnea'],
     file: 'Sleep_Hypnogram.svg' },
   { keywords: ['pain', 'opioid', 'analges'],
-    file: 'Children%27s_pain_scale.jpg' },
+    file: '1506_Referred_Pain_Chart.jpg' },
 ];
 
 // Fallback image used when no condition keyword matches
