@@ -7,7 +7,7 @@ const DB_NAME = 'clinical_trials';
 const COLLECTION = 'studies';
 
 // Maps condition keywords to a relevant Wikimedia Commons image filename.
-// The first matching entry wins, so order matters
+// The first matching entry wins, so order matters (more specific first).
 const CONDITION_IMAGE_MAP = [
   { keywords: ['cancer', 'tumor', 'carcinoma', 'oncol', 'lymphoma', 'leukemia', 'melanoma', 'neoplasm'],
     file: 'Cancer_cells.jpg' },
@@ -20,19 +20,19 @@ const CONDITION_IMAGE_MAP = [
   { keywords: ['asthma', 'pulmonar', 'respiratory', 'copd', 'bronch'],
     file: 'Asthma_attack-illustration_NIH.jpg' },
   { keywords: ['depression', 'anxiety', 'mental', 'psychiatr', 'schizophr', 'bipolar'],
-    file: 'Mental_health_historial.jpg' },
+    file: 'Sadness_and_depression.jpg' },
   { keywords: ['stroke', 'parkinson', 'epileps', 'multiple sclerosis', 'neuro'],
     file: 'Human_brain_NIH.jpg' },
   { keywords: ['hiv', 'aids', 'hepatitis', 'infection', 'viral'],
     file: 'HIV-budding-Color.jpg' },
   { keywords: ['arthritis', 'rheumat', 'lupus', 'autoimmune'],
-    file: 'Rheumatoid_Arthritis.jpg' },
+    file: 'Rheumatoid_arthritis_joint_evolution-en.svg' },
   { keywords: ['obesity', 'weight', 'bmi', 'metabolic'],
     file: 'Body_mass_index_chart.svg' },
   { keywords: ['sleep', 'insomnia', 'apnea'],
-    file: 'Polysomnogram_sleep_staging.png' },
+    file: 'Sleep_EEG_REM.png' },
   { keywords: ['pain', 'opioid', 'analges'],
-    file: 'Pain_numeric_rating_scale.svg' },
+    file: 'Pain_assessment.jpg' },
 ];
 
 // Fallback image used when no condition keyword matches
@@ -63,7 +63,7 @@ async function downloadWikimediaImage(filename) {
   return Buffer.from(res.data);
 }
 
-// Simple sleep helper used to avoid hammering Wikimedia with requests
+// Simple sleep helper used to avoid hitting Wikimedia rate limits
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -74,8 +74,8 @@ async function main() {
   const db = client.db(DB_NAME);
   const col = db.collection(COLLECTION);
 
-  // GridFSBucket is MongoDB's built-in system for storing large files.
-  // We use a custom bucket name 'images' to keep it separate from default fs.files
+
+  // custom bucket name 'images' to keep it separate from default fs.files
   const bucket = new GridFSBucket(db, { bucketName: 'images' });
 
   // Cache maps filename -> GridFS ObjectId so we only download each image once
@@ -84,13 +84,20 @@ async function main() {
 
   console.log('=== Downloading and storing images in GridFS ===');
 
-  // Download each unique image and stream it into GridFS
   for (const filename of allFiles) {
+    // If this image was already uploaded in a previous run, reuse it
+    const existing = await bucket.find({ filename: filename }).toArray();
+    if (existing.length > 0) {
+      fileIdCache[filename] = existing[0]._id;
+      console.log(` Already in GridFS: ${filename}`);
+      continue;
+    }
+
     try {
-      console.log(`  Downloading: ${filename}`);
+      console.log(` Downloading: ${filename}`);
       const buffer = await downloadWikimediaImage(filename);
 
-      // Convert the buffer to a readable stream so we can pipe it into GridFS
+      // Convert buffer to readable stream to pipe into GridFS
       const readable = Readable.from(buffer);
       const uploadStream = bucket.openUploadStream(filename, {
         metadata: { source: 'wikimedia', originalFile: filename }
@@ -98,17 +105,19 @@ async function main() {
 
       readable.pipe(uploadStream);
 
-      // Wait for the upload to finish before moving to the next image
+      // Wait for upload to complete before moving to next image
       await new Promise((res, rej) => {
         uploadStream.on('finish', res);
         uploadStream.on('error', rej);
       });
 
       fileIdCache[filename] = uploadStream.id;
-      console.log(`  Stored: ${filename} (GridFS id: ${uploadStream.id})`);
-      await sleep(500);
+      console.log(` Stored: ${filename} (GridFS id: ${uploadStream.id})`);
+
+      // Wait 2 seconds between downloads for Wikimedia rate limits
+      await sleep(2000);
     } catch (err) {
-      console.log(`  Failed: ${filename} — ${err.message}`);
+      console.log(` Failed: ${filename} — ${err.message}`);
     }
   }
 
@@ -133,7 +142,7 @@ async function main() {
           filter: { _id: doc._id },
           update: {
             $set: {
-              // Store the GridFS file id so the backend can retrieve the image later
+              // Store GridFS file id so the backend can retrieve the image later
               image_file_id: fileId,
               image_filename: filename
             }
