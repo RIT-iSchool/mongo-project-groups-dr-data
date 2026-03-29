@@ -26,13 +26,13 @@ const CONDITION_IMAGE_MAP = [
   { keywords: ['hiv', 'aids', 'hepatitis', 'infection', 'viral'],
     file: 'HIV-budding-Color.jpg' },
   { keywords: ['arthritis', 'rheumat', 'lupus', 'autoimmune'],
-    file: 'Rheumatoid_Arthritis_Joint_Evolution.svg' },
+    file: 'Rheumatoid_arthritis.jpg' },
   { keywords: ['obesity', 'weight', 'bmi', 'metabolic'],
     file: 'Body_mass_index_chart.svg' },
   { keywords: ['sleep', 'insomnia', 'apnea'],
-    file: 'Sleep_EEG_REM.svg' },
+    file: 'Sleep_Hypnogram.svg' },
   { keywords: ['pain', 'opioid', 'analges'],
-    file: 'Pain_scale.jpg' },
+    file: 'Children%27s_pain_scale.jpg' },
 ];
 
 // Fallback image used when no condition keyword matches
