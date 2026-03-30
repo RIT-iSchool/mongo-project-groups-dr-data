@@ -1,0 +1,9 @@
+{
+  "name": "clinical-trials-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "mongodb": "^6.0.0",
+    "csv-parse": "^5.5.0",
+    "axios": "^1.6.0"
+  }
+}
