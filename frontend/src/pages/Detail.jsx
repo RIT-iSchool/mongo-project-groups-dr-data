@@ -84,36 +84,32 @@ export default function Detail() {
   }
 
   // ── Study data ─────────────────────────────────────────────────────────────
-  const title      = study.Study_Title || study.Brief_Title || 'Untitled Study';
-  const phase      = study.Phases         || 'Phase Unknown';
-  const studyStatus = study.Overall_Status || '';
+  const title       = study['Study Title']  || study.Study_Title  || study.Brief_Title || 'Untitled Study';
+  const phase       = study['Phases']       || study.Phases       || 'Phase Unknown';
+  const studyStatus = study['Study Status'] || study.Overall_Status || '';
   const statusClass = studyStatus.toLowerCase().replace(/\s+/g, '-');
-  const comments   = study.comments || [];
+  const comments    = study.comments || [];
 
   const metaItems = [
-    { label: 'NCT Number',   val: study.NCT_Number },
-    { label: 'Sponsor',      val: study.Lead_Sponsor_Name },
-    { label: 'Start Date',   val: study.Start_Date },
-    { label: 'Completion',   val: study.Completion_Date || study.Primary_Completion_Date },
-    { label: 'Study Type',   val: study.Study_Type },
-    { label: 'Enrollment',   val: study.Enrollment ? study.Enrollment + ' participants' : null },
+    { label: 'NCT Number',  val: study['NCT Number']      || study.NCT_Number },
+    { label: 'Sponsor',     val: study['Sponsor']         || study.Lead_Sponsor_Name },
+    { label: 'Start Date',  val: study['Start Date']      || study.Start_Date },
+    { label: 'Completion',  val: study['Completion Date'] || study.Completion_Date },
+    { label: 'Study Type',  val: study['Study Type']      || study.Study_Type },
+    { label: 'Age',         val: study['Age']             || study.Age },
+    { label: 'Sex',         val: study['Sex']             || study.Sex },
   ].filter(m => m.val);
 
-  const locations = study.Locations
-    ? study.Locations.split('|').map(l => l.trim()).filter(Boolean)
-    : [];
+  const locations = (study['Locations'] || study.Locations || '')
+    .split('|').map(l => l.trim()).filter(Boolean);
 
   const infoCards = [
-    { label: 'Primary Outcome',   val: study.Primary_Outcome_Measures },
-    { label: 'Secondary Outcome', val: study.Secondary_Outcome_Measures },
-    { label: 'Funded By',         val: study.Funded_Bys },
+    { label: 'Primary Outcome', val: study['Primary Outcome Measures'] || study.Primary_Outcome_Measures },
   ].filter(c => c.val);
 
   const eligItems = [
-    { label: 'Minimum Age', val: study.Minimum_Age },
-    { label: 'Maximum Age', val: study.Maximum_Age },
-    { label: 'Sex',         val: study.Sex },
-    { label: 'Healthy Volunteers', val: study.Accepts_Healthy_Volunteers },
+    { label: 'Age', val: study['Age'] || study.Age },
+    { label: 'Sex', val: study['Sex'] || study.Sex },
   ].filter(e => e.val);
 
   const imageUrl = study.image_file_id
@@ -142,7 +138,7 @@ export default function Detail() {
               <span className={`badge badge-status ${statusClass}`}>{studyStatus}</span>
             </div>
             <h1 className="detail-title">{title}</h1>
-            {study.Conditions && <p className="detail-condition">{study.Conditions}</p>}
+            {(study['Conditions'] || study.Conditions) && <p className="detail-condition">{(study['Conditions'] || study.Conditions)}</p>}
             <div className="detail-meta-grid">
               {metaItems.map(m => (
                 <div className="meta-item" key={m.label}>
@@ -180,10 +176,10 @@ export default function Detail() {
         {activeTab === 'overview' && (
           <div className="tab-panel">
             <h2 className="section-heading">Brief Summary</h2>
-            <p className="detail-body">{study.Brief_Summary || study.Detailed_Description || 'No summary available.'}</p>
+            <p className="detail-body">{(study['Brief Summary'] || study.Brief_Summary || study['Primary Outcome Measures']) || 'No summary available.'}</p>
 
             <h2 className="section-heading" style={{ marginTop: 32 }}>Interventions</h2>
-            <p className="detail-body">{study.Interventions || 'Not specified.'}</p>
+            <p className="detail-body">{(study['Interventions'] || study.Interventions) || 'Not specified.'}</p>
 
             {infoCards.length > 0 && (
               <div className="detail-info-cards">
@@ -202,7 +198,7 @@ export default function Detail() {
         {activeTab === 'eligibility' && (
           <div className="tab-panel">
             <h2 className="section-heading">Eligibility Criteria</h2>
-            <p className="detail-body">{study.Eligibility_Criteria || 'Not specified.'}</p>
+            <p className="detail-body">{(study['Eligibility Criteria'] || study.Eligibility_Criteria) || 'Not specified.'}</p>
             {eligItems.length > 0 && (
               <div className="eligibility-grid">
                 {eligItems.map(e => (

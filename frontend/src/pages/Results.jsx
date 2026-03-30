@@ -175,14 +175,14 @@ export default function Results() {
             <>
               <ul className="results-list">
                 {pageSlice.map((study, i) => {
-                  const phase     = study.Phases            || 'Phase Unknown';
-                  const status    = study.Overall_Status    || '';
-                  const sponsor   = study.Lead_Sponsor_Name || '';
-                  const condition = study.Conditions        || '';
-                  const brief     = study.Brief_Summary     || study.Brief_Title || '';
+                  const phase     = study['Phases']       || study.Phases            || 'Phase Unknown';
+                  const status    = study['Study Status'] || study.Overall_Status    || '';
+                  const sponsor   = study['Sponsor']      || study.Lead_Sponsor_Name || '';
+                  const condition = study['Conditions']   || study.Conditions        || '';
+                  const brief     = study['Primary Outcome Measures'] || study.Brief_Summary || study.Brief_Title || '';
                   const snippet   = brief.length > 200 ? brief.slice(0, 200) + '…' : brief;
-                  const location  = study.location_label    || '';
-                  const nctId     = study.NCT_Number        || study.nct_id || '';
+                  const location  = study['Locations']    || study.location_label    || '';
+                  const nctId     = study['NCT Number']   || study.NCT_Number        || study.nct_id || '';
                   const statusClass = status.toLowerCase().replace(/\s+/g, '-');
 
                   return (
@@ -196,7 +196,7 @@ export default function Results() {
                         <span className="card-phase">{phase}</span>
                         <span className={`card-status ${statusClass}`}>{status}</span>
                       </div>
-                      <h2 className="card-title">{study.Study_Title || study.Brief_Title || 'Untitled Study'}</h2>
+                      <h2 className="card-title">{study['Study Title'] || study.Study_Title || study.Brief_Title || 'Untitled Study'}</h2>
                       {condition && <p className="card-condition">{condition}</p>}
                       {snippet   && <p className="card-snippet">{snippet}</p>}
                       <div className="card-footer">
