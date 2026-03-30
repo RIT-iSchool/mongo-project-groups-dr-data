@@ -15,6 +15,10 @@ async function connectDB() {
   if (!db) {
     await client.connect();
     db = client.db(DB_NAME);
+
+    // TASK 3: Enabling Geospatial Capabilities
+    await db.collection('trials').createIndex({ location: '2dsphere' });
+
     console.log('Connected to MongoDB');
   }
   return db;
