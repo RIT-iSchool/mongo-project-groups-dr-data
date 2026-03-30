@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Detail — ClinicalSearch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-detail">
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-cross">✛</span>
+        <span class="logo-text">ClinicalSearch</span>
+      </a>
+      <div class="header-search-bar">
+        <input
+          type="text"
+          id="headerSearch"
+          class="header-input"
+          placeholder="New search…"
+          onkeydown="if(event.key==='Enter') doNewSearch()"
+          autocomplete="off"
+        />
+        <button class="btn-header-search" onclick="doNewSearch()">&#8594;</button>
+      </div>
+      <span class="header-tag">ISTE-438 &nbsp;·&nbsp; Group 3: Dr. Data</span>
+    </div>
+  </header>
+
+  <main class="detail-main">
+
+    <div id="loadingState" class="loading-state full-loading">
+      <div class="spinner"></div>
+      <p>Loading study…</p>
+    </div>
+
+    <div id="errorState" class="error-state" style="display:none">
+      <p>&#9888; Could not load this study. <a href="javascript:history.back()">Go back</a></p>
+    </div>
+
+    <div id="detailContent" style="display:none">
+
+      <nav class="breadcrumb">
+        <a href="/">Home</a>
+        <span class="bc-sep">&#8250;</span>
+        <a href="javascript:history.back()">Results</a>
+        <span class="bc-sep">&#8250;</span>
+        <span id="bcTitle">Study</span>
+      </nav>
+
+      <div class="detail-hero">
+        <div class="detail-hero-text">
+          <div class="detail-badges">
+            <span class="badge badge-phase" id="badgePhase"></span>
+            <span class="badge badge-status" id="badgeStatus"></span>
+          </div>
+          <h1 class="detail-title" id="studyTitle"></h1>
+          <p class="detail-condition" id="studyCondition"></p>
+          <div class="detail-meta-grid" id="metaGrid"></div>
+        </div>
+        <div class="detail-hero-image">
+          <img id="studyImage" src="" alt="Condition illustration" onerror="this.src='/images/default.svg'" />
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+        <button class="tab" data-tab="eligibility" onclick="switchTab('eligibility')">Eligibility</button>
+        <button class="tab" data-tab="locations" onclick="switchTab('locations')">Locations</button>
+        <button class="tab" data-tab="comments" onclick="switchTab('comments')">
+          Comments <span class="tab-badge" id="commentCount">0</span>
+        </button>
+      </div>
+
+      <div class="tab-panel active" id="tab-overview">
+        <h2 class="section-heading">Brief Summary</h2>
+        <p class="detail-body" id="briefSummary"></p>
+
+        <h2 class="section-heading" style="margin-top:32px">Interventions</h2>
+        <p class="detail-body" id="interventions"></p>
+
+        <div class="detail-info-cards" id="infoCards"></div>
+      </div>
+
+      <div class="tab-panel" id="tab-eligibility" style="display:none">
+        <h2 class="section-heading">Eligibility Criteria</h2>
+        <p class="detail-body" id="eligibilityCriteria"></p>
+
+        <div class="eligibility-grid" id="eligibilityGrid"></div>
+      </div>
+
+      <div class="tab-panel" id="tab-locations" style="display:none">
+        <h2 class="section-heading">Trial Locations</h2>
+        <div id="locationsList" class="locations-list"></div>
+      </div>
+
+      <div class="tab-panel" id="tab-comments" style="display:none">
+        <h2 class="section-heading">Comments</h2>
+
+        <div id="commentsList" class="comments-list"></div>
+
+        <div class="add-comment-box">
+          <h3 class="add-comment-title">Add a Comment</h3>
+          <input type="text" id="commenterName" class="side-input" placeholder="Your name (optional)" />
+          <textarea id="commentText" class="comment-textarea" placeholder="Share observations, notes, or context about this trial…" rows="4"></textarea>
+          <button class="btn-primary comment-submit" onclick="submitComment()">Post Comment</button>
+          <span class="comment-feedback" id="commentFeedback"></span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const API = 'http://172.16.0.66:5000';
+    let studyId = null;
+
+    (function init() {
+      const params = new URLSearchParams(window.location.search);
+      studyId = params.get('id');
+      if (!studyId) {
+        showError();
+        return;
+      }
+      fetchStudy(studyId);
+    })();
+
+    async function fetchStudy(id) {
+      try {
+        const res = await fetch(`${API}/api/studies/${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('Not found');
+        const study = await res.json();
+        renderStudy(study);
+      } catch(e) {
+        showError();
+        console.error(e);
+      }
+    }
+
+    function renderStudy(s) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('detailContent').style.display = 'block';
+
+      const title  = s.Study_Title || s.Brief_Title || 'Untitled Study';
+      const phase  = s.Phases || 'Phase Unknown';
+      const status = s.Overall_Status || '';
+
+      document.title = title + ' — ClinicalSearch';
+      document.getElementById('bcTitle').textContent = (title.length > 60 ? title.slice(0,60)+'…' : title);
+
+      document.getElementById('studyTitle').textContent     = title;
+      document.getElementById('studyCondition').textContent = s.Conditions || '';
+      document.getElementById('badgePhase').textContent     = phase;
+      document.getElementById('badgeStatus').textContent    = status;
+      document.getElementById('badgeStatus').className      = 'badge badge-status ' + (status.toLowerCase().replace(/\s+/g,'-'));
+
+      const img = document.getElementById('studyImage');
+      if (s.image_file_id) {
+        img.src = `${API}/api/images/${s.image_file_id}`;
+        img.alt = s.image_filename || 'Clinical illustration';
+      } else {
+        img.src = `${API}/api/images/default`;
+      }
+
+      const meta = [
+        { label: 'NCT Number',   val: s.NCT_Number },
+        { label: 'Sponsor',      val: s.Lead_Sponsor_Name },
+        { label: 'Start Date',   val: s.Start_Date },
+        { label: 'Completion',   val: s.Completion_Date || s.Primary_Completion_Date },
+        { label: 'Study Type',   val: s.Study_Type },
+        { label: 'Enrollment',   val: s.Enrollment ? s.Enrollment + ' participants' : null },
+      ];
+      const grid = document.getElementById('metaGrid');
+      meta.filter(m => m.val).forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'meta-item';
+        div.innerHTML = `<span class="meta-label">${escHtml(m.label)}</span>
+                         <span class="meta-val">${escHtml(m.val)}</span>`;
+        grid.appendChild(div);
+      });
+
+      document.getElementById('briefSummary').textContent =
+        s.Brief_Summary || s.Detailed_Description || 'No summary available.';
+      document.getElementById('interventions').textContent =
+        s.Interventions || 'Not specified.';
+
+      const cards = [
+        { label: 'Primary Outcome',   val: s.Primary_Outcome_Measures },
+        { label: 'Secondary Outcome', val: s.Secondary_Outcome_Measures },
+        { label: 'Funded By',         val: s.Funded_Bys },
+      ];
+      const infoCards = document.getElementById('infoCards');
+      cards.filter(c => c.val).forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'info-card';
+        div.innerHTML = `<h4 class="info-card-label">${escHtml(c.label)}</h4>
+                         <p class="info-card-val">${escHtml(c.val)}</p>`;
+        infoCards.appendChild(div);
+      });
+
+      document.getElementById('eligibilityCriteria').textContent =
+        s.Eligibility_Criteria || 'Not specified.';
+
+      const elig = [
+        { label: 'Minimum Age', val: s.Minimum_Age },
+        { label: 'Maximum Age', val: s.Maximum_Age },
+        { label: 'Sex',         val: s.Sex },
+        { label: 'Accepts Healthy Volunteers', val: s.Accepts_Healthy_Volunteers },
+      ];
+      const eligGrid = document.getElementById('eligibilityGrid');
+      elig.filter(e => e.val).forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'elig-item';
+        div.innerHTML = `<span class="elig-label">${escHtml(e.label)}</span>
+                         <span class="elig-val">${escHtml(e.val)}</span>`;
+        eligGrid.appendChild(div);
+      });
+
+      const locList = document.getElementById('locationsList');
+      if (s.Locations) {
+        const locs = s.Locations.split('|').map(l => l.trim()).filter(Boolean);
+        locs.forEach(loc => {
+          const div = document.createElement('div');
+          div.className = 'location-item';
+          div.innerHTML = `<span class="loc-icon">&#8982;</span> ${escHtml(loc)}`;
+          locList.appendChild(div);
+        });
+      } else {
+        locList.innerHTML = '<p class="detail-body">No location data available.</p>';
+      }
+
+      renderComments(s.comments || []);
+    }
+
+    function renderComments(comments) {
+      document.getElementById('commentCount').textContent = comments.length;
+      const list = document.getElementById('commentsList');
+      list.innerHTML = '';
+
+      if (comments.length === 0) {
+        list.innerHTML = '<p class="detail-body no-comments">No comments yet. Be the first to add one.</p>';
+        return;
+      }
+
+      comments.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        const date   = c.date ? new Date(c.date).toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}) : '';
+        const author = c.author || 'Anonymous';
+        div.innerHTML = `
+          <div class="comment-header">
+            <span class="comment-author">${escHtml(author)}</span>
+            ${date ? `<span class="comment-date">${escHtml(date)}</span>` : ''}
+          </div>
+          <p class="comment-body">${escHtml(c.text || c.comment || '')}</p>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    async function submitComment() {
+      const nameEl  = document.getElementById('commenterName');
+      const textEl  = document.getElementById('commentText');
+      const feedback = document.getElementById('commentFeedback');
+      const text = textEl.value.trim();
+
+      if (!text) {
+        feedback.style.color = '#e53935';
+        feedback.textContent = 'Please write a comment before submitting.';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/api/studies/${encodeURIComponent(studyId)}/comment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ author: nameEl.value.trim() || 'Anonymous', text })
+        });
+
+        if (!res.ok) throw new Error('Server error');
+        const updated = await res.json();
+
+        renderComments(updated.comments || []);
+        textEl.value  = '';
+        nameEl.value  = '';
+        feedback.style.color = '#2e7d32';
+        feedback.textContent = '✓ Comment posted!';
+        setTimeout(() => feedback.textContent = '', 3000);
+
+        switchTab('comments');
+      } catch(e) {
+        feedback.style.color = '#e53935';
+        feedback.textContent = 'Failed to post comment. Try again.';
+        console.error(e);
+      }
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      document.querySelectorAll('.tab-panel').forEach(p => {
+        p.style.display = p.id === 'tab-' + name ? 'block' : 'none';
+        p.classList.toggle('active', p.id === 'tab-' + name);
+      });
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display  = 'block';
+    }
+
+    function doNewSearch() {
+      const term = document.getElementById('headerSearch').value.trim();
+      if (term) window.location.href = '/results?q=' + encodeURIComponent(term);
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+
+</body>
+</html>
