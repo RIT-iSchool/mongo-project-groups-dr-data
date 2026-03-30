@@ -1,80 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Clinical Trials Search</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-  <div class="container">
-    <h1>Clinical Trials Search</h1>
-    <p class="subtitle">Search US clinical trial records — partial words and case-insensitive</p>
-
-    <label for="searchInput">Search Term:</label>
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="e.g. cardiac, diabet, cancer..."
-      onkeydown="if(event.key==='Enter') doSearch()"
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClinicalSearch — RIT Dr. Data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap"
+      rel="stylesheet"
     />
-    <div class="error" id="errorMsg">Please enter a search term.</div>
-
-    <button onclick="doSearch()">Search</button>
-
-    <hr>
-
-    <div class="geo-section">
-      <h3>Search by Location</h3>
-      <div class="geo-row">
-        <div>
-          <label for="latInput">Latitude</label>
-          <input type="text" id="latInput" placeholder="e.g. 40.7128" />
-        </div>
-        <div>
-          <label for="lngInput">Longitude</label>
-          <input type="text" id="lngInput" placeholder="e.g. -74.0060" />
-        </div>
-        <div>
-          <label for="radiusInput">Radius (miles)</label>
-          <input type="text" id="radiusInput" placeholder="e.g. 50" />
-        </div>
-      </div>
-      <button class="btn-geo" onclick="doGeoSearch()">Search by Location</button>
-    </div>
-  </div>
-
-  <footer>ISTE-438 &mdash; Group 3: Dr. Data &mdash; RIT 2026</footer>
-
-  <script>
-    function doSearch() {
-      const term = document.getElementById('searchInput').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
-      if (!term) {
-        errorMsg.style.display = 'block';
-        return;
-      }
-      errorMsg.style.display = 'none';
-      window.location.href = '/results?q=' + encodeURIComponent(term);
-    }
-
-    function doGeoSearch() {
-      const lat    = document.getElementById('latInput').value.trim();
-      const lng    = document.getElementById('lngInput').value.trim();
-      const radius = document.getElementById('radiusInput').value.trim();
-      const term   = document.getElementById('searchInput').value.trim();
-
-      if (!lat || !lng || !radius) {
-        alert('Please fill in latitude, longitude, and radius.');
-        return;
-      }
-
-      let url = '/results?lat=' + lat + '&lng=' + lng + '&radius=' + radius;
-      if (term) url += '&q=' + encodeURIComponent(term);
-      window.location.href = url;
-    }
-  </script>
-
-</body>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
