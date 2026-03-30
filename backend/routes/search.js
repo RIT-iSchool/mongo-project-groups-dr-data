@@ -96,7 +96,7 @@ async function runSearch(req, res, { requireGeo }) {
       return {
         // Did what Result.jsx was doing before 
         _id: doc._id,
-        title: doc.Study_Title || doc.Brief_Title || 'Untitled Study',
+        title: doc.Study_Title || doc.Brief_Title,
         condition: doc.Conditions || '',
         sponsor: doc.Lead_Sponsor_Name || '',
         snippet: brief.length > 200 ? brief.slice(0, 200) + '…' : brief,

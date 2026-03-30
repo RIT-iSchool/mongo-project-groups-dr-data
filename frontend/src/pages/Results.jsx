@@ -183,19 +183,7 @@ export default function Results() {
                   const nctId     = study.nctId;
                   const phase     = study.phase;
                   const status    = study.status;
-                                  
-                  // uncommented this for now until this works -> Take a look at search.js in const summary
-                  // did the same thing below but in search.js to make this look neat                 
-                  // const phase     = study['Phases']       || study.Phases            || 'Phase Unknown';
-                  // const status    = study['Study Status'] || study.Overall_Status    || '';
-                  // const sponsor   = study['Sponsor']      || study.Lead_Sponsor_Name || '';
-                  // const condition = study['Conditions']   || study.Conditions        || '';
-                  // const brief     = study['Primary Outcome Measures'] || study.Brief_Summary || study.Brief_Title || '';
-                  // const snippet   = brief.length > 200 ? brief.slice(0, 200) + '…' : brief;
-                  // const location  = study['Locations']    || study.location_label    || '';
-                  // const nctId     = study['NCT Number']   || study.NCT_Number        || study.nct_id || '';
-                  // const statusClass = status.toLowerCase().replace(/\s+/g, '-');
-
+                                
                   return (
                     <li
                       key={study._id}
