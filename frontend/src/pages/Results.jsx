@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 
-const API       = 'http://172.16.0.66:5000';
+const API = process.env.REACT_APP_API_URL || 'http://172.16.0.66:5000';
 const PAGE_SIZE = 15;
 
 export default function Results() {
