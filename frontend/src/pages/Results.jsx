@@ -175,15 +175,26 @@ export default function Results() {
             <>
               <ul className="results-list">
                 {pageSlice.map((study, i) => {
-                  const phase     = study['Phases']       || study.Phases            || 'Phase Unknown';
-                  const status    = study['Study Status'] || study.Overall_Status    || '';
-                  const sponsor   = study['Sponsor']      || study.Lead_Sponsor_Name || '';
-                  const condition = study['Conditions']   || study.Conditions        || '';
-                  const brief     = study['Primary Outcome Measures'] || study.Brief_Summary || study.Brief_Title || '';
-                  const snippet   = brief.length > 200 ? brief.slice(0, 200) + '…' : brief;
-                  const location  = study['Locations']    || study.location_label    || '';
-                  const nctId     = study['NCT Number']   || study.NCT_Number        || study.nct_id || '';
-                  const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+                  const snippet = study.snippet;
+                  const title   = study.title;
+                  const condition = study.condition;
+                  const sponsor   = study.sponsor;
+                  const location  = study.location;
+                  const nctId     = study.nctId;
+                  const phase     = study.phase;
+                  const status    = study.status;
+                                  
+                  // uncommented this for now until this works -> Take a look at search.js in const summary
+                  // did the same thing below but in search.js to make this look neat                 
+                  // const phase     = study['Phases']       || study.Phases            || 'Phase Unknown';
+                  // const status    = study['Study Status'] || study.Overall_Status    || '';
+                  // const sponsor   = study['Sponsor']      || study.Lead_Sponsor_Name || '';
+                  // const condition = study['Conditions']   || study.Conditions        || '';
+                  // const brief     = study['Primary Outcome Measures'] || study.Brief_Summary || study.Brief_Title || '';
+                  // const snippet   = brief.length > 200 ? brief.slice(0, 200) + '…' : brief;
+                  // const location  = study['Locations']    || study.location_label    || '';
+                  // const nctId     = study['NCT Number']   || study.NCT_Number        || study.nct_id || '';
+                  // const statusClass = status.toLowerCase().replace(/\s+/g, '-');
 
                   return (
                     <li
@@ -194,11 +205,13 @@ export default function Results() {
                     >
                       <div className="card-meta-row">
                         <span className="card-phase">{phase}</span>
-                        <span className={`card-status ${statusClass}`}>{status}</span>
+                        <span className={`card-status ${status.toLowerCase().replace(/\s+/g, '-')}`}>{status}</span>
                       </div>
-                      <h2 className="card-title">{study['Study Title'] || study.Study_Title || study.Brief_Title || 'Untitled Study'}</h2>
+                      
+                      <h2 className="card-title">{title}</h2>
                       {condition && <p className="card-condition">{condition}</p>}
                       {snippet   && <p className="card-snippet">{snippet}</p>}
+                      
                       <div className="card-footer">
                         {sponsor  && <span className="card-footer-item">◆ {sponsor}</span>}
                         {location && <span className="card-footer-item">⌖ {location}</span>}
