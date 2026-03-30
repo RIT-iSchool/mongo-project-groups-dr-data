@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 
-const API = 'http://172.16.0.66:5000';
+const API = 'http://172.16.0.66:5001';
 
 export default function Detail() {
   const [searchParams]   = useSearchParams();
