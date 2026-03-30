@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 
-const API = 'http://172.16.0.66:5001';
+const API = import.meta.env.VITE_API_BASE_URL || '';
 
 export default function Detail() {
   const [searchParams]   = useSearchParams();

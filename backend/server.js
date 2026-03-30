@@ -6,11 +6,13 @@ const cors = require('cors');
 const { connectDB } = require('./db/connection');
 
 const app = express();
-const PORT = 5000;
+const PORT = Number(process.env.PORT) || 5001;
 
 // Middleware
-// for frontend 
-app.use(cors());
+// for frontend
+app.use(cors({
+  origin: true,
+}));
 app.use(express.json());
 
 // Import route files

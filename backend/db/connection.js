@@ -5,6 +5,7 @@ const { MongoClient } = require('mongodb');
 
 const URI = 'mongodb://mongoapp:huMONGOu5@localhost:27017/clinical_trials?authSource=clinical_trials';
 const DB_NAME = 'clinical_trials';
+const STUDIES_COLLECTION = 'studies';
 
 // Single client instance 
 const client = new MongoClient(URI);
@@ -16,8 +17,8 @@ async function connectDB() {
     await client.connect();
     db = client.db(DB_NAME);
 
-    // TASK 3: Enabling Geospatial Capabilities
-    await db.collection('trials').createIndex({ location: '2dsphere' });
+    // Ensure the collection used by the app supports geo queries.
+    await db.collection(STUDIES_COLLECTION).createIndex({ location_geo: '2dsphere' });
 
     console.log('Connected to MongoDB');
   }
@@ -30,4 +31,4 @@ function getDB() {
   return db;
 }
 
-module.exports = { connectDB, getDB };
+module.exports = { connectDB, getDB, STUDIES_COLLECTION };

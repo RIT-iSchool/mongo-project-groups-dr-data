@@ -1,33 +1,93 @@
-// juan task 2 and chris task 3
-
 const express = require('express');
 const router = express.Router();
-const { getDB } = require('../db/connection');
+const { getDB, STUDIES_COLLECTION } = require('../db/connection');
 
-// TASK 3: Geospatial Search Endpoint - Search endpoint with geospatial query
-router.get('/', async (req, res) => {
+const SEARCH_FIELDS = [
+  'Study_Title',
+  'Brief_Title',
+  'Brief_Summary',
+  'Detailed_Description',
+  'Conditions',
+  'Interventions',
+  'Lead_Sponsor_Name',
+  'NCT_Number',
+];
+
+function buildKeywordQuery(term) {
+  if (!term || !term.trim()) {
+    return null;
+  }
+
+  const regex = new RegExp(term.trim(), 'i');
+  return {
+    $or: SEARCH_FIELDS.map((field) => ({ [field]: regex })),
+  };
+}
+
+function buildGeoQuery(lat, lng, radiusMiles) {
+  const latitude = Number.parseFloat(lat);
+  const longitude = Number.parseFloat(lng);
+  const miles = Number.parseFloat(radiusMiles);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return null;
+  }
+
+  const maxDistanceMeters = Number.isFinite(miles) && miles > 0
+    ? miles * 1609.34
+    : 5 * 1609.34;
+
+  return {
+    location_geo: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [longitude, latitude],
+        },
+        $maxDistance: maxDistanceMeters,
+      },
+    },
+  };
+}
+
+async function runSearch(req, res, { requireGeo }) {
   try {
     const db = getDB();
-    const { lat, lng, radius } = req.query;
-    let query = {};
+    const { q = '', lat, lng, radius } = req.query;
+    const filters = [];
 
-    if (lat && lng) {
-        query.location = {
-            $near: {
-                $geometry: {
-                    type: "Point",
-                    coordinates: [parseFloat(lng), parseFloat(lat)]
-                },
-                $maxDistance: parseFloat(radius) || 5000 // Default to 5km if radius not provided
-            }
-        }
+    const keywordQuery = buildKeywordQuery(q);
+    if (keywordQuery) {
+      filters.push(keywordQuery);
     }
-    const trials = await db.collection('trials').find(query).toArray();
-    res.status(200).json(trials);
 
+    const geoQuery = buildGeoQuery(lat, lng, radius);
+    if (geoQuery) {
+      filters.push(geoQuery);
+    } else if (requireGeo) {
+      return res.status(400).json({ error: 'lat, lng, and radius must be valid numbers.' });
+    }
+
+    const query = filters.length === 0 ? {} : filters.length === 1 ? filters[0] : { $and: filters };
+    const studies = await db
+      .collection(STUDIES_COLLECTION)
+      .find(query)
+      .limit(250)
+      .toArray();
+
+    return res.status(200).json(studies);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Search route error:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
+}
+
+router.get('/', async (req, res) => {
+  return runSearch(req, res, { requireGeo: false });
+});
+
+router.get('/geo', async (req, res) => {
+  return runSearch(req, res, { requireGeo: true });
 });
 
 module.exports = router;
