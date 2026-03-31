@@ -1,4 +1,9 @@
 Clinical Trials: Geospatial Search & GridFS Image Management System
+Group: Dr. Data
+
+DESCRIPTION:
+This application allows users to search for clinical trials by keyword and geographic
+location. It utilizes MongoDB for data storage and GridFS for binary image management.
 
 TECHNOLOGY STACK:
 For this project, we used the following stack to meet the requirements
@@ -64,5 +69,6 @@ HOW TO USE:
 1) Connect to the RLES VM and open the project in VS Code to access the environment.
 2) In the backend and frontend terminals, run the start command
 3) Open Firefox within the VM, and paste the local link
+
 
 
