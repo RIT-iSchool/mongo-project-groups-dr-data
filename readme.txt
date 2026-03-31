@@ -2,7 +2,7 @@ Clinical Trials: Geospatial Search & GridFS Image Management System
 Group: Dr. Data
 
 DESCRIPTION:
-This application allows users to search for clinical trials by keyword and geographic
+This application allows users to search for clinical trials in the US by keyword and geographic
 location. It utilizes MongoDB for data storage and GridFS for binary image management.
 
 TECHNOLOGY STACK:
@@ -40,35 +40,38 @@ To load the database, we performed the following steps:
       with a 2dsphere index for geospatial searching.
 
 4) Challenges
-      - Ensuring the MongoDB authentication worked across the RLES VM environment.
+      - Ensuring the MongoDB authentication worked across the RLES VM environment. 
+      - The VM had port issues on 3000
+      - VM networking issues
+
 
 
 VOLUME:
 After loading the data, we ran the countDocuments() command across all collections
 
 Collection name: studies
-Result of countDocuments():
+Result of countDocuments(): 50707
 
 Collection name: images.files
-Result of countDocuments():
+Result of countDocuments(): 13
 
 Collection name: images.chunks
-Result of countDocuments():
-
-Collection name: system.indexes
-Result of countDocuments(): 3
+Result of countDocuments(): 72
 
 
-VARIETY:
-To see the capabilities of the application, try searching the following terms:
-      - Cancer
-      - Rochester 
-      - 
+
+BELLS AND WHISTLES:
+- The application's design is appealing to the eye and easy for the users to understand. 
+- Websites provides options for recommended searches
+
+
 
 HOW TO USE:
 1) Connect to the RLES VM and open the project in VS Code to access the environment.
-2) In the backend and frontend terminals, run the start command
-3) Open Firefox within the VM, and paste the local link
+2) The IP address for the VM is 172.16.0.66
+3) In the backend terminal use the command line 'node server.js'
+4) In the frontend terminal, use the command line 'npm run dev'
+5) Open Firefox within the VM, and paste the local link
 
 
 
