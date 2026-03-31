@@ -6,13 +6,14 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    allowedHosts: ['drdata.webdev.gccis.rit.edu'],
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
       '/health': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
     },
