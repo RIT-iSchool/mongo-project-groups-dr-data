@@ -176,13 +176,14 @@ export default function Results() {
               <ul className="results-list">
                 {pageSlice.map((study, i) => {
                   const snippet = study.snippet;
-                  const title   = study.title;
-                  const condition = study.condition;
-                  const sponsor   = study.sponsor;
-                  const location  = study.location;
-                  const nctId     = study.nctId;
-                  const phase     = study.phase;
-                  const status    = study.status;
+                  const title   = study.title || study.Study_Title || study.Brief_Title || 'Untitled Study';
+                  const condition = study.condition || study.Conditions || '';
+                  const sponsor   = study.sponsor || study.Lead_Sponsor_Name || '';
+                  const location  = study.location || study.location_label || '';
+                  const nctId     = study.nctId || study.NCT_Number || '';
+                  const phase     = study.phase || study.Phases || 'Phase Unknown';
+                  const status    = study.status || study.Overall_Status || study['Study Status'] || '';
+                  const statusClass = status ? status.toLowerCase().replace(/\s+/g, '-') : '';
                                 
                   return (
                     <li
@@ -193,7 +194,7 @@ export default function Results() {
                     >
                       <div className="card-meta-row">
                         <span className="card-phase">{phase}</span>
-                        <span className={`card-status ${status.toLowerCase().replace(/\s+/g, '-')}`}>{status}</span>
+                        {status && <span className={`card-status ${statusClass}`}>{status}</span>}
                       </div>
                       
                       <h2 className="card-title">{title}</h2>

@@ -86,7 +86,7 @@ export default function Detail() {
   // ── Study data ─────────────────────────────────────────────────────────────
   const title      = study.Study_Title || study.Brief_Title || 'Untitled Study';
   const phase      = study.Phases         || 'Phase Unknown';
-  const studyStatus = study.Overall_Status || '';
+  const studyStatus = study.Overall_Status || study['Study Status'] || '';
   const statusClass = studyStatus.toLowerCase().replace(/\s+/g, '-');
   const comments   = study.comments || [];
 

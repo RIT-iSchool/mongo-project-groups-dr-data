@@ -78,21 +78,31 @@ async function runSearch(req, res, { requireGeo }) {
           Study_Title: 1,
           Brief_Title: 1,
           Brief_Summary: 1,
+          Detailed_Description: 1,
           Primary_Outcome_Measures: 1,
           Conditions: 1,
           Lead_Sponsor_Name: 1,
           NCT_Number: 1,
           Phases: 1,
+          Overall_Status: 1,
           'Study Status': 1,
-          Locations: 1
+          Locations: 1,
+          location_label: 1,
         }
       })
       .limit(250)
       .toArray();
 
     // This will create a snippet and send the fields needed to the frontend - Task 2 
-    const summary = studies.map (doc => {
-        const brief = doc.Primary_Outcome_Measures || doc.Brief_Summary || doc.Brief_Title || '';
+    const summary = studies.map((doc) => {
+      const brief = doc.Primary_Outcome_Measures
+        || doc.Brief_Summary
+        || doc.Detailed_Description
+        || doc.Brief_Title
+        || '';
+      const status = doc.Overall_Status || doc['Study Status'] || '';
+      const location = doc.location_label || doc.Locations || '';
+
       return {
         // Did what Result.jsx was doing before 
         _id: doc._id,
@@ -100,10 +110,18 @@ async function runSearch(req, res, { requireGeo }) {
         condition: doc.Conditions || '',
         sponsor: doc.Lead_Sponsor_Name || '',
         snippet: brief.length > 200 ? brief.slice(0, 200) + '…' : brief,
-        location: doc.Locations || '',
+        location,
         nctId: doc.NCT_Number || '',
         phase: doc.Phases || 'Phase Unknown',
-        status: doc['Study Status'] || ''
+        status,
+        Study_Title: doc.Study_Title,
+        Brief_Title: doc.Brief_Title,
+        Conditions: doc.Conditions || '',
+        Lead_Sponsor_Name: doc.Lead_Sponsor_Name || '',
+        NCT_Number: doc.NCT_Number || '',
+        Phases: doc.Phases || 'Phase Unknown',
+        Overall_Status: status,
+        location_label: location,
       };
     });
 
